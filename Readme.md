@@ -1,0 +1,1 @@
+Criação de uma simples rede autoencoder em python.
