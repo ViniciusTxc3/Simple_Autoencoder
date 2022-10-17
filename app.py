@@ -6,6 +6,7 @@ pip install -r requirements.txt # baixar
 '''
 
 # Library necessary
+import matplotlib.pyplot as plt
 from tensorflow import keras
 from tensorflow.keras import layers
 from pickletools import optimize
@@ -13,8 +14,6 @@ from keras.layers import Dense, Conv2D, MaxPool2D, UpSampling2D
 from keras import Input, Model
 from keras.datasets import mnist
 import numpy as np
-import matplotlib.pyplot as plt
-
 
 # '''
 # Construção do modelo:
@@ -80,54 +79,109 @@ import matplotlib.pyplot as plt
 #     ax.get_yaxis().set_visible(False)
 # plt.show()
 
-#####################################################################3
+#####################################################################
 
 '''
-Deep CNN Autoencoder:
+# Deep CNN Autoencoder:
 
-Como estamos usando imagens, faz sentido usar uma rede neural convolucional (CNN).
-Composto por um vetor de camadas Conv2D e max-pooling e o decodificador será um vetor Conv2D e Upsampling.
+# Como estamos usando imagens, faz sentido usar uma rede neural convolucional (CNN).
+# Composto por um vetor de camadas Conv2D e max-pooling e o decodificador será um vetor Conv2D e Upsampling.
+# '''
+# model = keras.Sequential()
+# # encoder network
+# model.add(Conv2D(30, 3, activation='relu', padding='same', input_shape = (28,28,1)))
+# model.add(MaxPool2D(2, padding = 'same'))
+# model.add(Conv2D(15, 3, activation= 'relu', padding='same'))
+# model.add(MaxPool2D(2, padding = 'same'))
+# # decoder network
+# model.add(Conv2D(15, 3, activation= 'relu', padding='same'))
+# model.add(UpSampling2D(2))
+# model.add(Conv2D(30, 3, activation= 'relu', padding='same'))
+# model.add(UpSampling2D(2))
+# model.add(Conv2D(1, 3, activation= 'sigmoid', padding='same')) # output layer
+# model.compile(optimizer= 'adam', loss= 'binary_crossentropy')
+# model.summary()
+
+# # Carregando dados e treinando o modelo
+# (x_train, _), (x_test, _) = mnist.load_data()
+# x_train = x_train.astype('float')/255.
+# x_test = x_test.astype('float')/255.
+# x_train = np.reshape(x_train,  (len(x_train), 28, 28, 1))
+# x_test = np.reshape(x_test,  (len(x_test), 28, 28, 1))
+# model.fit(x_train, x_train,
+#                 epochs=15,
+#                 batch_size=128,
+#                 validation_data=(x_test, x_test))
+
+# # Fornecendo o input e gerando a saída dos resultados
+# pred = model.predict(x_test)
+# plt.figure(figsize=(20, 4))
+# for i in range(5):
+#     # Display original
+#     ax = plt.subplot(2, 5, i + 1)
+#     plt.imshow(x_test[i].reshape(28, 28))
+#     plt.gray()
+#     ax.get_xaxis().set_visible(False)
+#     ax.get_yaxis().set_visible(False)
+#     # Display reconstruction
+#     ax = plt.subplot(2, 5, i + 1 + 5)
+#     plt.imshow(pred[i].reshape(28, 28))
+#     plt.gray()
+#     ax.get_xaxis().set_visible(False)
+#     ax.get_yaxis().set_visible(False)
+# plt.show()
+
+# #####################################################################
+
 '''
-model = keras.Sequential()
-# encoder network
-model.add(Conv2D(30, 3, activation='relu', padding='same', input_shape = (28,28,1)))
-model.add(MaxPool2D(2, padding = 'same'))
-model.add(Conv2D(15, 3, activation= 'relu', padding='same'))
-model.add(MaxPool2D(2, padding = 'same'))
-# decoder network
-model.add(Conv2D(15, 3, activation= 'relu', padding='same'))
-model.add(UpSampling2D(2))
-model.add(Conv2D(30, 3, activation= 'relu', padding='same'))
-model.add(UpSampling2D(2))
-model.add(Conv2D(1, 3, activation= 'sigmoid', padding='same')) # output layer
-model.compile(optimizer= 'adam', loss= 'binary_crossentropy')
-model.summary()
+Utilizando o modelo para ver o comportamento em imagens ruidosas, alterando cor e insrindo ruídos
 
-# Carregando dados e treinando o modelo
-(x_train, _), (x_test, _) = mnist.load_data()
-x_train = x_train.astype('float')/255.
-x_test = x_test.astype('float')/255.
-x_train = np.reshape(x_train,  (len(x_train), 28, 28, 1))
-x_test = np.reshape(x_test,  (len(x_test), 28, 28, 1))
-model.fit(x_train, x_train,
-                epochs=15,
-                batch_size=128,
-                validation_data=(x_test, x_test))
+Denoising Autoencoder:
+'''
+def Denoising_Autoencoder():
+    # Carregando dados e treinando o modelo
+    (x_train, _), (x_test, _) = mnist.load_data()
+    x_train = x_train.astype('float')/255.
+    x_test = x_test.astype('float')/255.
+    x_train = np.reshape(x_train,  (len(x_train), 28, 28, 1))
+    x_test = np.reshape(x_test,  (len(x_test), 28, 28, 1))
 
-# Fornecendo o input e gerando a saída dos resultados
-pred = model.predict(x_test)
-plt.figure(figsize=(20, 4))
-for i in range(5):
-    # Display original
-    ax = plt.subplot(2, 5, i + 1)
-    plt.imshow(x_test[i].reshape(28, 28))
-    plt.gray()
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-    # Display reconstruction
-    ax = plt.subplot(2, 5, i + 1 + 5)
-    plt.imshow(pred[i].reshape(28, 28))
-    plt.gray()
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-plt.show()
+
+    noise_factor = 0.7
+    x_train_noisy = x_train + noise_factor * np.random.normal(loc=0.0, scale=1.0, size=x_train.shape) 
+    x_test_noisy = x_test + noise_factor * np.random.normal(loc=0.0, scale=1.0, size=x_test.shape) 
+    x_train_noisy = np.clip(x_train_noisy, 0., 1.)
+    x_test_noisy = np.clip(x_test_noisy, 0., 1.)
+    # Plot figuras ruidosas
+    plt.figure(figsize=(20, 2))
+    for i in range(1, 5 + 1):
+        ax = plt.subplot(1, 5, i)
+        plt.imshow(x_test_noisy[i].reshape(28, 28))
+        plt.gray()
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+    plt.show()
+
+    '''
+    Com as imagens ruidosas, vamos aplicar a técnica autoencoder e modificando as camadas do modelo para aumentar 
+    o filtro para que o modelo tenha um melhor desempenho e depois se ajuste ao modelo.'''
+    model = keras.Sequential()
+    # encoder network
+    model.add(Conv2D(35, 3, activation= 'relu', padding='same', input_shape = (28,28,1)))
+    model.add(MaxPool2D(2, padding= 'same'))
+    model.add(Conv2D(25, 3, activation= 'relu', padding='same'))
+    model.add(MaxPool2D(2, padding= 'same'))
+    #decoder network
+    model.add(Conv2D(25, 3, activation= 'relu', padding='same'))
+    model.add(UpSampling2D(2))
+    model.add(Conv2D(35, 3, activation= 'relu', padding='same'))
+    model.add(UpSampling2D(2))
+    model.add(Conv2D(1,3,activation='sigmoid', padding= 'same')) # output layer
+    model.compile(optimizer= 'adam', loss = 'binary_crossentropy')
+    model.fit(x_train_noisy, x_train,
+                    epochs=2,
+                    batch_size=128,
+                    validation_data=(x_test_noisy, x_test))
+
+if __name__ == "__main__":
+    Denoising_Autoencoder()
